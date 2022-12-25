@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="TabbedMenu" src="project://database/Assets/Ordinary%20Cartoon%20Maker/UI/TabbedMenu/TabbedMenu.uxml?fileID=9197481963319205126&amp;guid=0b29ea257c009704d85de66715f43895&amp;type=3#TabbedMenu" />
+    <Style src="project://database/Assets/Ordinary%20Cartoon%20Maker/UI/EditorWindow/OrdinaryCartoonMakerEditor.uss?fileID=7433441132597879392&amp;guid=84f6229c555c19549928a4e02171ddf8&amp;type=3#OrdinaryCartoonMakerEditor" />
+    <ui:Instance template="TabbedMenu" name="TabbedMenu" />
+</ui:UXML>

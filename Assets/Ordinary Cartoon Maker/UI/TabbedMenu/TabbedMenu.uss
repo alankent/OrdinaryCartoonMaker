@@ -1,0 +1,44 @@
+/* Style for tabs */
+#tabs {
+    /*flex-basis: 30px;*/
+    flex-direction: row;
+    /*background-color: rgb(229, 223, 223);*/
+    /*-unity-font-style: bold;*/
+    font-size: 14px;
+}
+
+/* Sets each label in tabs to have the same size. */
+.tab {
+    flex-grow: 1;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border-bottom-width: 1px;
+    border-top-width: 0px;
+    padding: 6px;
+    background-color: rgb(40,40,40);
+    border-color: rgb(160,160,255);
+}
+
+/* Adds background color for the selected tab */
+.currentlySelectedTab {
+    /*background-color: rgb(173, 166, 166);*/
+    /*border-color: rgb(229, 223, 223);*/
+    background-color: rgb(60,60,60);
+    margin-top: 5px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 0px;
+}
+
+/* Style for tabContent */
+#tabContent {
+    /*flex-basis: 100%;*/
+    /*background-color: rgb(255, 255, 255);*/
+    /*font-size: 20px;*/
+}
+
+/* Hides the unselected tab content */
+.unselectedContent {
+    display: none;
+}
