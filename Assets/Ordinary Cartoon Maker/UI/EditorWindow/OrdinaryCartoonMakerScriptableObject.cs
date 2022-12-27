@@ -476,7 +476,6 @@ namespace OrdinaryCartoonMaker
         };
         private string[] BubbleImages =
         {
-             // TODO: Different speech bubble types? (thought, ...)
             "Assets/Ordinary Cartoon Maker/Images/Speech Bubbles/speech-5.png",
             "Assets/Ordinary Cartoon Maker/Images/Speech Bubbles/speech-6.png",
             "Assets/Ordinary Cartoon Maker/Images/Speech Bubbles/speech-7.png",
@@ -529,7 +528,7 @@ namespace OrdinaryCartoonMaker
             EditorUtility.SetDirty(shot.timeline);
             AssetDatabase.SaveAssetIfDirty(shot.timeline);
 
-            // TODO: Need to tell Timeline window to refresh! (It does not show the new track otherwise)
+            // Need to tell Timeline window to refresh! (It does not show the new track otherwise)
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
         }
 
