@@ -41,6 +41,8 @@ namespace OrdinaryCartoonMaker
             rootVisualElement.Q<Button>("CreateEpisodeButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.CreateEpisode() );
             rootVisualElement.Q<Button>("CreatePartButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.CreatePart());
             rootVisualElement.Q<Button>("CreateShotButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.CreateShot());
+            //rootVisualElement.Q<Button>("RecordShotButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.RecordShot());
+            rootVisualElement.Q<Button>("AddCharacterButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.AddCharacter());
             rootVisualElement.Q<Button>("CreateSpeechBubbleButton").RegisterCallback<ClickEvent>((ClickEvent ev) => maker.CreateSpeechBubble());
 
             // Default episode details from the current scene.
@@ -59,13 +61,17 @@ namespace OrdinaryCartoonMaker
             cameraType.choices = CameraTypeTemplates.AvailableTemplates();
             cameraType.index = 0;
 
-            // Get list of camera type prefabs
+            // Get list of camera position prefabs
             var cameraPosition = rootVisualElement.Q<DropdownField>("CameraPosition");
             List<string> positions = new();
             positions.Add("Align With View");
             positions.AddRange(CameraPositionTemplates.AvailableTemplates());
             cameraPosition.choices = positions;
             cameraPosition.index = 0;
+
+            // Get list of characters, positions, and animations for adding new characters
+            var characterSelection = rootVisualElement.Q<DropdownField>("CharacterSelection");
+            characterSelection.choices = CharacterTemplates.AvailableTemplates();
         }
 
         private void OnSelectionChange()

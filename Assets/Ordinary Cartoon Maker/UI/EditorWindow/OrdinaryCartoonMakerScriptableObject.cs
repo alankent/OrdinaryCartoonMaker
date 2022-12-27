@@ -1,4 +1,5 @@
 using Cinemachine;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Recorder;
@@ -7,7 +8,9 @@ using UnityEditor.SceneManagement;
 using UnityEditor.Timeline;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Sequences.Timeline;
+using UnityEngine.Timeline;
 using UnityEngine.UIElements;
 
 namespace OrdinaryCartoonMaker
@@ -32,11 +35,25 @@ namespace OrdinaryCartoonMaker
         public string CameraType = "";
         public string CameraPosition = "";
         public string CreateShotErrorMessage = "";
+#if false
+        // Not working reliably (and possibly not needed).
+        public string RecordShotErrorMessage = "";
+#endif
+
+        public List<string> CharacterSelectionChoices = new();
+        public List<string> CharacterPositionChoices = new();
+        public List<string> CharacterAnimationChoices = new();
+        public string CharacterSelection = "";
+        public string CharacterPosition = "";
+        public string CharacterAnimation = "";
+        public string AddCharacterErrorMessage = "";
 
         public string SpeechBubbleText = "";
         public bool SpeechBubbleAutoWrap = false;
         public SpeechBubblePositionEnum SpeechBubblePosition = SpeechBubblePositionEnum.TopLeft;
         public string CreateSpeechBubbleErrorMessage = "";
+
+        // ================== Create Episode ==================
 
         public void CreateEpisode()
         {
@@ -141,6 +158,8 @@ namespace OrdinaryCartoonMaker
             }
         }
 
+        // ================== Create Part ==================
+
         public void CreatePart()
         {
             CreatePartErrorMessage = "";
@@ -165,9 +184,11 @@ namespace OrdinaryCartoonMaker
             SequencesApi.CreatePartSequence(episodeName, PartNumber, PartDuration);
         }
 
+        // ================== Create Shot ==================
+
         public void CreateShot()
         {
-            Debug.Log("CREATE SHOT");
+            //Debug.Log("CREATE SHOT");
 
             CreateShotErrorMessage = "";
             string episodeName = AssembleEpisodeTitle(EpisodeNumber, EpisodeTitle);
@@ -240,7 +261,8 @@ namespace OrdinaryCartoonMaker
                 {
                     var path = CameraTypeTemplates.GetTemplatePath(CameraType);
                     var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    PrefabUtility.InstantiatePrefab(prefab, shotTransform);
+                    var instance = PrefabUtility.InstantiatePrefab(prefab, shotTransform) as GameObject;
+                    PrefabUtility.UnpackPrefabInstance(instance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
                 }
             }
 
@@ -267,6 +289,44 @@ namespace OrdinaryCartoonMaker
             }
         }
 
+#if false
+        // This is not working reliably (and probably not needed since you can do it through context menu anyway).
+        public void RecordShot()
+        {
+            Debug.Log("Record Shot");
+
+            RecordShotErrorMessage = "";
+            string episodeName = AssembleEpisodeTitle(EpisodeNumber, EpisodeTitle);
+
+            if (EpisodeNumber == "" || EpisodeTitle == "" || PartNumber == "" || ShotNumber == "")
+            {
+                RecordShotErrorMessage = "Please select shot first.";
+                return;
+            }
+            var shot = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
+            if (shot == null)
+            {
+                RecordShotErrorMessage = "Shot sequence not found.";
+                return;
+            }
+
+            var rs = new RecordSequence();
+            UnityEditor.Timeline.Actions.ActionContext context = new();
+            var clipToRecord = new List<TimelineClip>();
+            clipToRecord.Add(shot.GetTimelineSequence().editorialClip);
+            Debug.Log(shot.GetTimelineSequence().name);
+            Debug.Log(shot.GetTimelineSequence().editorialClip.displayName);
+            context.clips = clipToRecord;
+            context.tracks = new List<TrackAsset>();
+            if (rs.Validate(context) != UnityEditor.Timeline.Actions.ActionValidity.Valid)
+            {
+                RecordShotErrorMessage = "Recorder says context not valid.";
+                return;
+            }
+            rs.Execute(context);
+        }
+#endif
+
         private void MoveVirtualCamera(Transform node, Transform newPosition)
         {
             if (node.GetComponent<CinemachineVirtualCamera>() != null)
@@ -280,7 +340,134 @@ namespace OrdinaryCartoonMaker
             }
         }
 
-        // ===== Speech bubbles =====
+        // ================== Add Character ==================
+
+        public void AddCharacter()
+        {
+            Debug.Log("Add character");
+            AddCharacterErrorMessage = "";
+
+            if (EpisodeNumber == "" || EpisodeTitle == "" || PartNumber == "" || ShotNumber == "")
+            {
+                AddCharacterErrorMessage = "Select the shot to add to.";
+                return;
+            }
+            if (CharacterSelection == "")
+            {
+                AddCharacterErrorMessage = "Select the character to add.";
+                return;
+            }
+
+            string episodeName = AssembleEpisodeTitle(EpisodeNumber, EpisodeTitle);
+            var shotSeq = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
+            if (shotSeq == null)
+            {
+                AddCharacterErrorMessage = "Create the shot sequence first.";
+                return;
+            }
+            var shot = shotSeq.GetTimelineSequence();
+
+            var path = CharacterTemplates.GetTemplatePath(CharacterSelection);
+            Debug.Log(path);
+            var instructions = AssetDatabase.LoadAssetAtPath<CharacterInstructions>(path);
+            Debug.Log("Position: " + instructions.transform.position.ToString());
+
+            var prefab = instructions.CharacterPrefab;
+            if (prefab == null)
+            {
+                CreateSpeechBubbleErrorMessage = "Character instructions did not specify character.";
+                return;
+            }
+
+            var inst = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+            inst.transform.parent = shotSeq.GetTransform();
+
+            // Move object to correct position.
+            var instructionsTransform = instructions.GetComponent<Transform>();
+            if (instructionsTransform.position == Vector3.zero && instructionsTransform.rotation.eulerAngles == Vector3.zero)
+            {
+                // 0,0,0 means move it into the scene view looking at camera.
+                var sceneView = UnityEditor.SceneView.lastActiveSceneView;
+                if (sceneView != null)
+                {
+                    inst.transform.position = sceneView.camera.transform.position + 4f * sceneView.camera.transform.forward;
+
+                    // Default it to look at the scene camera
+                    var offset = 180f;
+                    inst.transform.rotation = Quaternion.Euler(0f, sceneView.rotation.eulerAngles.y + offset, 0f);
+
+                    // Try to make it land on ground so don't have to get the Y value correct manually
+                    // https://answers.unity.com/questions/39203/instantiate-object-and-align-with-object-surface.html
+                    RaycastHit hit;
+                    var down = new Vector3(0, -1, 0);
+                    if (Physics.Raycast(inst.transform.position, down, out hit))
+                    {
+                        // if too far away, its probably best to leave at middle of scene view
+                        var distanceToGround = hit.distance;
+                        if (distanceToGround < 3f)
+                        {
+                            var currentPos = inst.transform.position;
+                            var newY = currentPos.y - distanceToGround;
+                            inst.transform.position = new Vector3(currentPos.x, newY, currentPos.z);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // If not 0,0,0, then move object to that position.
+                inst.transform.position = instructionsTransform.position;
+                inst.transform.rotation = instructionsTransform.rotation;
+            }
+
+            TimelineAsset timeline = shot.timeline;
+            if (inst.GetComponent<Animator>() == null)
+            {
+                AddCharacterErrorMessage = "Character prefab does not have Animator.";
+                return;
+            }
+            AnimationTrack track = timeline.CreateTrack<AnimationTrack>(null, name);
+            shotSeq.GetTransform().GetComponent<PlayableDirector>().SetGenericBinding(track, inst);
+            track.trackOffset = TrackOffset.ApplySceneOffsets;
+
+            if (instructions.BodyClip == null)
+            {
+                AddCharacterErrorMessage = "Character instructions body clip not set.";
+                return;
+            }
+            var timelineClip = track.CreateClip(instructions.BodyClip);
+            timelineClip.start = 1;
+            timelineClip.duration = 5;
+
+            if (instructions.LeftHandClip != null)
+            {
+                AddOverrideTrack(timeline, track, instructions.LeftHandClip, "Left Hand");
+            }
+            if (instructions.RightHandClip != null)
+            {
+                AddOverrideTrack(timeline, track, instructions.RightHandClip, "Right Hand");
+            }
+            if (instructions.FacialExpressionClip != null)
+            {
+                AddOverrideTrack(timeline, track, instructions.FacialExpressionClip, "Facial Expression");
+            }
+
+            TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+        }
+
+        private void AddOverrideTrack(TimelineAsset timeline, AnimationTrack parent, AnimationClip clip, string name)
+        {
+            var overrideTrack = timeline.CreateTrack<AnimationTrack>(parent, name);
+            overrideTrack.applyAvatarMask = true;
+            overrideTrack.avatarMask = AssetDatabase.LoadAssetAtPath<AvatarMask>("Assets/Ordinary Cartoon Maker/Avatar Masks/" + name + " Avatar Mask.mask");
+
+            var timelineClip = overrideTrack.CreateClip(clip);
+            timelineClip.start = 1;
+            timelineClip.duration = 5;
+        }
+
+        // ================== Speach Bubbles ==================
+
         private Vector2[] BubblePositions =
         {
             new Vector2(-500, 300),  new Vector2(0, 300),  new Vector2(500, 300),

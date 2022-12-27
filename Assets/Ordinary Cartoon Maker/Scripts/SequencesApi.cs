@@ -14,11 +14,13 @@ namespace OrdinaryCartoonMaker
     {
         public class SequenceReference
         {
+            private Transform transform;
             private MasterSequence master;
             private TimelineSequence seq;
 
-            public SequenceReference(MasterSequence master, TimelineSequence seq)
+            public SequenceReference(Transform transform, MasterSequence master, TimelineSequence seq)
             {
+                this.transform = transform;
                 this.master = master;
                 this.seq = seq;
             }
@@ -28,13 +30,18 @@ namespace OrdinaryCartoonMaker
                 return master;
             }
 
+            public Transform GetTransform()
+            {
+                return transform;
+            }
+
             public SequenceReference Child(string childName)
             {
                 foreach (var child in seq.children)
                 {
                     if (child.name == childName)
                     {
-                        return new SequenceReference(master, child as TimelineSequence);
+                        return new SequenceReference(transform.Find(childName), master, child as TimelineSequence);
                     }
                 }
                 return null;
@@ -49,19 +56,17 @@ namespace OrdinaryCartoonMaker
         // Returns the root master sequence if it exists, or null if it is not found.
         public static SequenceReference RootSequence(string episodeName)
         {
-            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            GameObject[] gameObjects = scene.GetRootGameObjects();
-            foreach (var go in gameObjects)
+            var transform = FindRootGameObject(episodeName);
+
+            if (transform != null)
             {
-                if (go.name == episodeName)
+                var sf = transform.GetComponent<SequenceFilter>();
+                if (sf != null && sf.masterSequence != null)
                 {
-                    var sf = go.GetComponent<SequenceFilter>();
-                    if (sf != null && sf.masterSequence != null)
-                    {
-                        return new SequenceReference(sf.masterSequence, sf.masterSequence.rootSequence);
-                    }
+                    return new SequenceReference(transform, sf.masterSequence, sf.masterSequence.rootSequence);
                 }
             }
+            
             //Debug.Log("Did not find master sequence: " + episodeName);
             return null;
         }
@@ -71,7 +76,32 @@ namespace OrdinaryCartoonMaker
         {
             var master = SequenceUtility.CreateMasterSequence(episodeName, fps);
             var seq = master.rootSequence;
-            return new SequenceReference(master, seq);
+
+            var transform = FindRootGameObject(episodeName);
+            if (transform != null)
+            {
+                var sf = transform.GetComponent<SequenceFilter>();
+                if (sf != null && sf.masterSequence != null)
+                {
+                    return new SequenceReference(transform, master, seq);
+                }
+            }
+
+            return new SequenceReference(null, master, seq);
+        }
+
+        private static Transform FindRootGameObject(string name)
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            GameObject[] gameObjects = scene.GetRootGameObjects();
+            foreach (var go in gameObjects)
+            {
+                if (go.name == name)
+                {
+                    return go.transform;
+                }
+            }
+            return null;
         }
 
         public static SequenceReference PartSequence(string episodeName, string partNumber)
@@ -99,7 +129,7 @@ namespace OrdinaryCartoonMaker
             EditorUtility.SetDirty(part.timeline);
             AssetDatabase.SaveAssetIfDirty(part.timeline);
 
-            return new SequenceReference(root.GetMaster(), part);
+            return new SequenceReference(root.GetTransform().Find(partNumber), root.GetMaster(), part);
         }
 
         public static SequenceReference ShotSequence(string episodeName, string partNumber, string shotNumber)
@@ -129,7 +159,7 @@ namespace OrdinaryCartoonMaker
             EditorUtility.SetDirty(shot.timeline);
             AssetDatabase.SaveAssetIfDirty(shot.timeline);
 
-            return new SequenceReference(root.GetMaster(), shot);
+            return new SequenceReference(root.GetTransform().Find(partNumber).Find(shotNumber), root.GetMaster(), shot);
         }
     }
 }
