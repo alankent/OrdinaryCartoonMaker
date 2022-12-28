@@ -159,6 +159,13 @@ with music). A track is added to display the speech bubbles. Adjustments are
 normally required to get the bubble positioned correctly, but its useful to
 quickly get it in the right posiion.
 
+## Future plans
+
+I would like to make it easier to create animation clips using motion capture
+from a webcam (like VSeeFace + EVMC4U + EasyMotionCapture), VR headset and
+controllers, or something like Sony Mocopi.
+Still experimenting. It might make more sense as a seperate window.
+
 ## Known issues
 
 * I have not worked out how to set the recorder track movie file type via script. The filename is set, but the file type stays as MP4 (not WebM).
