@@ -1,11 +1,14 @@
 # Ordinary Cartoon Maker
 
-This repository holds helper code for use with the
+![Editor Window](./docs/EpisodeTab.png)
+
+This repository holds code for a Unity Editor Window for use with the
 [Unity Sequences](https://docs.unity3d.com/Packages/com.unity.sequences@1.1/manual/index.html)
 package. This is a tool I use to create a cartoon series on YouTube,
 designed for my personal specific needs. If you don't like the way I have set
 up my projects, you may still find this package useful as sample code for
-creating your own helper tools.
+creating your own helper tools for manipulating Sequences, Timelines,
+Animation Tracks, etc.
 
 I use Unity as a rendering engine for 3D models, locations, lighting, and
 special effects (not games), using Unity Timelines, capturing the output in
@@ -14,28 +17,31 @@ to assemble Timelines. This tool is an additional editor window with a
 few common operations I perform to speed my work up. Full cartoon creation
 is still a lot of additional work beyond this tool.
 
-## Overview
+## Project structure organization
 
 I create animated cartoons using Unity Sequences organized into a hierarchy of
 episode/part/shot.  Parts are to help group shots logically within an episode.
 I create a new Unity project per location as when I included everything in one
-project, Unity slowed down quite a lot. So to create one episode I may generate
+project, Unity slowed down too much (I have big location assets, like complete
+city scenes, from the Unity asset store). So to create one episode I generate
 a series of shot video clip files in multiple Unity projects.
 
-Each such location project has a `Assets/_LOCAL` directory under which I put my
-own files related to that location to keep them separated from assets I import
-from the asset store or similar. (I only back up the `_LOCAL` directory.)
-I also have a shared `Assets/_SHARED` package that contains assets I use
-across multiple location projects, such as character models and various
-animation clips and C# scripts. (This tool started its life there.)
+In each location project I create a `Assets/_LOCAL` directory under which I put
+my own files related to that location to keep them separated from assets I
+import from the asset store or similar. (I only need to back up the `_LOCAL`
+directory.) I also have a shared `Assets/_SHARED` package that contains assets
+I use across multiple location projects, such as character models, 
+animation clips, and general C# scripts. (This tool started its life there.)
 
-Each shot typically creates a single video file of a few seconds long
-(sometimes shots generate multiple video files). I then use video editing
-software to join the different video clip files.
+Each shot typically creates a single video file of a few seconds long.
+I then use video editing software to join the different video clip files.
 To keep things organized, each video clip file has a filename of the form
 `ep1-10-100` (episode number, part number, shot number). Using this numbering
 scheme makes it easy to gather and sort all the video clips by filename
 for composing the final video file.
+Sometimes I break the rule and create multiple video clips from
+a single Sequence, but normally I create a new sequence per shot so I can
+change camera settings per video clip (e.g. to adjust exposure).
 
 The Editor window in this tool can
 
@@ -77,6 +83,8 @@ tabs. You normally work left to right across the tabs.
 
 ### Episode
 
+![Episode Tab](./docs/EpisodeTab.png)
+
 To start a new Scene, enter the episode number and title. Select a template for
 default objects to add to a scene (for example, you might have a HDRP global
 profile you use at the scene level for all scenes). The frame rate can also be
@@ -96,11 +104,15 @@ sequence is then created in the scene.
 
 ### Part
 
+![Part Tab](./docs/PartTab.png)
+
 Enter the part number and a rough duration (I take the number of expected shots
 and multiply by 10 assuming 10 seconds per shot) to create a "part"
 sub-sequence under the master sequence in the scene.
 
 ### Shot
+
+![Shot Tab](./docs/ShotTab.png)
 
 Enter the shot number, recording type (movie file or a single still frame that
 I sometimes use between parts), camera type, and camera position to create a
@@ -118,6 +130,8 @@ of field settings or HDRP settings).
 
 ### Character
 
+![Character Tab](./docs/CharacterTab.png)
+
 With a shot selected, select a character, typipcally at a specific location
 with a default animation clip (e.g. Sam, in the classroom, with a sitting
 aniamtion clip at his desk). The character prefab is added under the shot
@@ -133,6 +147,8 @@ that location. The animation tracks will almost certainly need editing - this
 setup is to reduce the manual effort to get going.
 
 ### Speech
+
+![Speech Tab](./docs/SpeechTab.png)
 
 With a shot selected, enter text to display in a speech bubble (my cartoons
 while animated, do not have a voice track at the moment - I use speech bubbles
