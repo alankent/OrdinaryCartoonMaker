@@ -8,7 +8,7 @@ package. This is a tool I use to create a cartoon series on YouTube,
 designed for my personal specific needs. If you don't like the way I have set
 up my projects, you may still find this package useful as sample code for
 creating your own helper tools for manipulating Sequences, Timelines,
-Animation Tracks, etc.
+Animation Tracks, etc. It uses UI Toolkit for the UI.
 
 I use Unity as a rendering engine for 3D models, locations, lighting, and
 special effects (not games), using Unity Timelines, capturing the output in
@@ -16,6 +16,8 @@ video files. Think of cutscenes in a game. I work in Editor mode
 to assemble Timelines. This tool is an additional editor window with a
 few common operations I perform to speed my work up. Full cartoon creation
 is still a lot of additional work beyond this tool.
+
+![Sample shot](./docs/EORainSampleShot.png)
 
 ## Project structure organization
 
@@ -62,6 +64,7 @@ objects. This tool assumes the hierarchy of Timelines is
 
 I typically use part numbers of 10, 20, 30 etc to make it easier to insert a
 new part between existing parts without renumbering the existing parts.
+E.g. I may add part 15 between parts 10 and 20.
 Similarly I use shot numbers of 010, 020, 030, etc to make it easier to insert
 new shots. Episodes for me are typically 5 minutes (300 seconds) or less where
 each shot is around 3 seconds resulting in around 100 shots per episode.
