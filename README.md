@@ -17,6 +17,8 @@ to assemble Timelines. This tool is an additional editor window with a
 few common operations I perform to speed my work up. Full cartoon creation
 is still a lot of additional work beyond this tool.
 
+Here is a sample shot from [episode 1](https://youtu.be/4DDU01Kg9Lw).
+
 ![Sample shot](./docs/EORainSampleShot.png)
 
 ## Project structure organization
@@ -26,14 +28,15 @@ episode/part/shot.  Parts are to help group shots logically within an episode.
 I create a new Unity project per location as when I included everything in one
 project, Unity slowed down too much (I have big location assets, like complete
 city scenes, from the Unity asset store). So to create one episode I generate
-a series of shot video clip files in multiple Unity projects.
+a series of shot video clip files in multiple Unity projects. Each location 
+project has a Unity scene per episode, if that location appears in that episode.
 
 In each location project I create a `Assets/_LOCAL` directory under which I put
 my own files related to that location to keep them separated from assets I
-import from the asset store or similar. (I only need to back up the `_LOCAL`
+import from the asset store etc. (I only need to back up the `_LOCAL`
 directory.) I also have a shared `Assets/_SHARED` package that contains assets
 I use across multiple location projects, such as character models, 
-animation clips, and general C# scripts. (This tool started its life there.)
+animation clips, and general C# scripts.
 
 Each shot typically creates a single video file of a few seconds long.
 I then use video editing software to join the different video clip files.
@@ -47,7 +50,7 @@ change camera settings per video clip (e.g. to adjust exposure).
 
 The Editor window in this tool can
 
-* Start a new scene for a new episode
+* Start a new Unity scene for a new episode
 * Add parts to the scene (for grouping a series of shots)
 * Add shots to scenes with the choice of camera to use
 * Add characters to shots creating animation tracks for the characters
@@ -96,14 +99,11 @@ film).
 
 Create scene templates by creating a scene in the directory `Assets/Ordinary
 Cartoon Maker/Templates/Scenes` or `Assets/_LOCAL/Ordinary Cartoon
-Maker/Templates/Scenes` (I used `_LOCAL` for assets related to the current
-project).
+Maker/Templates/Scenes`.
 
 The "Create Epsiode" button then creates an episode scene file such as
-`Assets/_LOCAL/Episodes/Episode 1 - Outsider/Episode 1 - Outsider.unity`. (I
-use the `Assets/_LOCAL` directory to keep my episode related files separate
-from other packages imported from the Unity asset store.) An empty "master"
-sequence is then created in the scene. 
+`Assets/_LOCAL/Episodes/Episode 1 - Outsider/Episode 1 - Outsider.unity`.
+An empty "master" sequence is then created in the scene. 
 
 ### Part
 
@@ -158,3 +158,7 @@ while animated, do not have a voice track at the moment - I use speech bubbles
 with music). A track is added to display the speech bubbles. Adjustments are
 normally required to get the bubble positioned correctly, but its useful to
 quickly get it in the right posiion.
+
+## Known issues
+
+* I have not worked out how to set the recorder track movie file type via script. The filename is set, but the file type stays as MP4 (not WebM).
