@@ -147,7 +147,7 @@ of field settings or HDRP settings).
 
 With a shot selected, select a character, typipcally at a specific location
 with a default animation clip (e.g. Sam, in the classroom, with a sitting
-aniamtion clip at his desk). The character prefab is added under the shot
+animation clip at his desk). The character prefab is added under the shot
 sequence, an animation track is created, override tracks are added if hand
 animation clips/poses are included, etc.
 
@@ -156,8 +156,8 @@ To provide the information to creat the animation track prefabs with a
 `Assets/_LOCAL/Ordinary Cartoon Maker/Templates/Characters`. Subfolders can be
 used, which will map onto nested menu items. E.g. create a folder per
 character, with a subfolder per location, then a prefab per animation clip at
-that location. The animation tracks will almost certainly need editing - this
-setup is to reduce the manual effort to get going.
+that location. The animation tracks will almost certainly need further editing
+- this setup is to reduce the manual effort to get going.
 
 ### Speech
 
@@ -178,6 +178,3 @@ from a webcam (like VSeeFace + EVMC4U + EasyMotionCapture), VR headset and
 controllers, or something like Sony Mocopi.
 Still experimenting. It might make more sense as a seperate window.
 
-### Known issues
-
-* I have not worked out how to set the recorder track movie file type via script. The filename is set, but the file type stays as MP4 (not WebM).
