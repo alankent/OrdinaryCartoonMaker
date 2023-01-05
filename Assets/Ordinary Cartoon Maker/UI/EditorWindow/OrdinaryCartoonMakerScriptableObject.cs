@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Recorder;
+using UnityEditor.Recorder.Encoder;
 using UnityEditor.Recorder.Timeline;
 using UnityEditor.SceneManagement;
 using UnityEditor.Timeline;
@@ -213,36 +214,54 @@ namespace OrdinaryCartoonMaker
                 CreateShotErrorMessage = "The shot sequence already exists.";
                 return;
             }
-            var shotSeq = SequencesApi.CreateShotSequence(episodeName, PartNumber, ShotNumber);
-            var shot = shotSeq.GetTimelineSequence();
-            var master = shotSeq.GetMaster();
+            var shot = SequencesApi.CreateShotSequence(episodeName, PartNumber, ShotNumber);
+            var shotTimeline = shot.GetComponent<PlayableDirector>().playableAsset as TimelineAsset;
 
             // Add recorder track and clip
             {
-                var recorderTrack = shot.timeline.CreateTrack<RecorderTrack>("Recorder");
+                var recorderTrack = shotTimeline.CreateTrack<RecorderTrack>("Recorder");
                 var timelineClip = recorderTrack.CreateClip<RecorderClip>();
+                timelineClip.blendInDuration = 0;
+                timelineClip.blendOutDuration = 0;
+                EditorUtility.SetDirty(shotTimeline);
+                AssetDatabase.SaveAssetIfDirty(shotTimeline);
+                TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);
+
                 var recorderClip = timelineClip.asset as RecorderClip;
 
                 if (RecordingType == RecordingTypeEnum.Movie)
                 {
                     timelineClip.start = 2;
                     timelineClip.duration = 5;
+                    recorderClip.name = "WebM Movie Recorder clip";
                     var mrs = ScriptableObject.CreateInstance<MovieRecorderSettings>();
-                    mrs.OutputFormat = MovieRecorderSettings.VideoRecorderOutputFormat.WebM; // TODO: THIS IS NOT WORKING!
-                    mrs.VideoBitRateMode = VideoBitrateMode.High;
-                    mrs.FileNameGenerator.FileName = $"ep{EpisodeNumber}/ep{EpisodeNumber}-{PartNumber}-{ShotNumber}";
+                    mrs.name = "WebM Movie Recorder Settings";
+                    var settings = new CoreEncoderSettings
+                    {
+                        Codec = CoreEncoderSettings.OutputCodec.WEBM,
+                        EncodingQuality = CoreEncoderSettings.VideoEncodingQuality.High
+                    };
+                    mrs.EncoderSettings = settings;
+                    mrs.FileNameGenerator.FileName = $"ep{EpisodeNumber}-{PartNumber}-{ShotNumber}";
                     recorderClip.settings = mrs;
-                    Debug.Log(mrs.ToString());
                 }
                 else
                 {
                     timelineClip.start = 2;
-                    timelineClip.duration = 1.0 / master.rootSequence.fps;
+                    timelineClip.duration = 1.0 / (SequencesApi.RootSequence(episodeName).GetComponent<PlayableDirector>().playableAsset as TimelineAsset).editorSettings.frameRate;
+                    recorderClip.name = "PNG Image Recorder clip";
                     var mrs = ScriptableObject.CreateInstance<ImageRecorderSettings>();
-                    mrs.OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.PNG; // TODO: I AM NOT SURE THIS IS WORKING (it might be the default)
-                    mrs.FileNameGenerator.FileName = $"ep{EpisodeNumber}/ep{EpisodeNumber}-{PartNumber}-{ShotNumber}";
+                    mrs.name = "PNG Image Recorder Settings";
+                    mrs.OutputFormat = ImageRecorderSettings.ImageRecorderOutputFormat.PNG;
+                    mrs.FileNameGenerator.FileName = $"ep{EpisodeNumber}-{PartNumber}-{ShotNumber}";
                     recorderClip.settings = mrs;
                 }
+
+                // Add the settings asset as a child asset of the recorder clip
+                AssetDatabase.AddObjectToAsset(recorderClip.settings, recorderClip);
+                EditorUtility.SetDirty(recorderClip);
+                AssetDatabase.SaveAssetIfDirty(recorderClip);
+                TimelineEditor.Refresh(RefreshReason.ContentsModified);
             }
 
             // Add camera prefab to scene hierarchy
@@ -359,13 +378,12 @@ namespace OrdinaryCartoonMaker
             }
 
             string episodeName = AssembleEpisodeTitle(EpisodeNumber, EpisodeTitle);
-            var shotSeq = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
-            if (shotSeq == null)
+            var shot = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
+            if (shot == null)
             {
                 AddCharacterErrorMessage = "Create the shot sequence first.";
                 return;
             }
-            var shot = shotSeq.GetTimelineSequence();
 
             var path = CharacterTemplates.GetTemplatePath(CharacterSelection);
             Debug.Log(path);
@@ -380,7 +398,7 @@ namespace OrdinaryCartoonMaker
             }
 
             var inst = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-            inst.transform.parent = shotSeq.GetTransform();
+            inst.transform.parent = shot;
 
             // Move object to correct position.
             var instructionsTransform = instructions.GetComponent<Transform>();
@@ -420,14 +438,14 @@ namespace OrdinaryCartoonMaker
                 inst.transform.rotation = instructionsTransform.rotation;
             }
 
-            TimelineAsset timeline = shot.timeline;
+            TimelineAsset timeline = shot.GetComponent<PlayableDirector>().playableAsset as TimelineAsset;
             if (inst.GetComponent<Animator>() == null)
             {
                 AddCharacterErrorMessage = "Character prefab does not have Animator.";
                 return;
             }
             AnimationTrack track = timeline.CreateTrack<AnimationTrack>(null, name);
-            shotSeq.GetTransform().GetComponent<PlayableDirector>().SetGenericBinding(track, inst);
+            shot.GetComponent<PlayableDirector>().SetGenericBinding(track, inst);
             track.trackOffset = TrackOffset.ApplySceneOffsets;
 
             if (instructions.BodyClip == null)
@@ -504,16 +522,16 @@ namespace OrdinaryCartoonMaker
             }
 
             string episodeName = AssembleEpisodeTitle(EpisodeNumber, EpisodeTitle);
-            var shotSeq = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
-            if (shotSeq == null)
+            var shot = SequencesApi.ShotSequence(episodeName, PartNumber, ShotNumber);
+            if (shot == null)
             {
                 CreateSpeechBubbleErrorMessage = "Create the shot sequence first.";
                 return;
             }
-            var shot = shotSeq.GetTimelineSequence();
+            var shotTimeline = shot.GetComponent<PlayableDirector>().playableAsset as TimelineAsset;
 
             // Speech bubble
-            var speechTrack = shot.timeline.CreateTrack<StoryboardWithTextTrack>(SpeechBubbleText.Length > 15 ? SpeechBubbleText.Substring(0, 12) + "..." : SpeechBubbleText);
+            var speechTrack = shotTimeline.CreateTrack<StoryboardWithTextTrack>(SpeechBubbleText.Length > 15 ? SpeechBubbleText.Substring(0, 12) + "..." : SpeechBubbleText);
             Debug.Log(speechTrack);
             var speechTimlineClip = speechTrack.CreateClip<StoryboardWithTextPlayableAsset>();
             var speechClip = speechTimlineClip.asset as StoryboardWithTextPlayableAsset;
@@ -525,8 +543,8 @@ namespace OrdinaryCartoonMaker
             speechClip.board = AssetDatabase.LoadAssetAtPath<Texture>(BubbleImages[(int)SpeechBubblePosition]);
             speechClip.position = BubblePositions[(int)SpeechBubblePosition];
 
-            EditorUtility.SetDirty(shot.timeline);
-            AssetDatabase.SaveAssetIfDirty(shot.timeline);
+            EditorUtility.SetDirty(shotTimeline);
+            AssetDatabase.SaveAssetIfDirty(shotTimeline);
 
             // Need to tell Timeline window to refresh! (It does not show the new track otherwise)
             TimelineEditor.Refresh(RefreshReason.ContentsAddedOrRemoved);

@@ -5,6 +5,10 @@ using UnityEditor.Sequences;
 using UnityEngine.Sequences;
 using System;
 using UnityEditor;
+using UnityEngine.Timeline;
+using UnityEngine.Playables;
+using UnityEngine.Sequences.Timeline;
+using System.Reflection;
 
 namespace OrdinaryCartoonMaker
 {
@@ -12,91 +16,14 @@ namespace OrdinaryCartoonMaker
     // to the Sequences package API will not impact the rest of this package.
     public class SequencesApi
     {
-        public class SequenceReference
-        {
-            private Transform transform;
-            private MasterSequence master;
-            private TimelineSequence seq;
-
-            public SequenceReference(Transform transform, MasterSequence master, TimelineSequence seq)
-            {
-                this.transform = transform;
-                this.master = master;
-                this.seq = seq;
-            }
-
-            public MasterSequence GetMaster()
-            {
-                return master;
-            }
-
-            public Transform GetTransform()
-            {
-                return transform;
-            }
-
-            public SequenceReference Child(string childName)
-            {
-                foreach (var child in seq.children)
-                {
-                    if (child.name == childName)
-                    {
-                        return new SequenceReference(transform.Find(childName), master, child as TimelineSequence);
-                    }
-                }
-                return null;
-            }
-
-            public TimelineSequence GetTimelineSequence()
-            {
-                return seq as TimelineSequence;
-            }
-        }
-
         // Returns the root master sequence if it exists, or null if it is not found.
-        public static SequenceReference RootSequence(string episodeName)
-        {
-            var transform = FindRootGameObject(episodeName);
-
-            if (transform != null)
-            {
-                var sf = transform.GetComponent<SequenceFilter>();
-                if (sf != null && sf.masterSequence != null)
-                {
-                    return new SequenceReference(transform, sf.masterSequence, sf.masterSequence.rootSequence);
-                }
-            }
-            
-            //Debug.Log("Did not find master sequence: " + episodeName);
-            return null;
-        }
-
-        // Create the master sequence and return it.
-        public static SequenceReference CreateMasterSequence(string episodeName, float fps)
-        {
-            var master = SequenceUtility.CreateMasterSequence(episodeName, fps);
-            var seq = master.rootSequence;
-
-            var transform = FindRootGameObject(episodeName);
-            if (transform != null)
-            {
-                var sf = transform.GetComponent<SequenceFilter>();
-                if (sf != null && sf.masterSequence != null)
-                {
-                    return new SequenceReference(transform, master, seq);
-                }
-            }
-
-            return new SequenceReference(null, master, seq);
-        }
-
-        private static Transform FindRootGameObject(string name)
+        public static Transform RootSequence(string episodeName)
         {
             var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             GameObject[] gameObjects = scene.GetRootGameObjects();
             foreach (var go in gameObjects)
             {
-                if (go.name == name)
+                if (go.name == episodeName)
                 {
                     return go.transform;
                 }
@@ -104,62 +31,109 @@ namespace OrdinaryCartoonMaker
             return null;
         }
 
-        public static SequenceReference PartSequence(string episodeName, string partNumber)
+        // Create the master sequence and return it.
+        public static Transform CreateMasterSequence(string episodeName, float fps)
         {
-            var root = RootSequence(episodeName);
-            var part = root.Child(partNumber);
-            return part;
+            var master = SequenceUtility.CreateMasterSequence(episodeName, fps);
+            return RootSequence(episodeName);
         }
 
-        public static SequenceReference CreatePartSequence(string episodeName, string partNumber, int partDuration)
+        public static Transform PartSequence(string episodeName, string partNumber)
+        {
+            return RootSequence(episodeName).Find(partNumber);
+        }
+
+        public static Transform CreatePartSequence(string episodeName, string partNumber, int partDuration)
         {
             var root = RootSequence(episodeName);
-            var part = SequenceUtility.CreateSequence(partNumber, root.GetMaster());
+            var rootTimeline = root.GetComponent<PlayableDirector>().playableAsset as TimelineAsset;
+            var rootSequence = GetTimelineSequence(root);
+            var part = SequenceUtility.CreateSequence(partNumber, GetMasterSequence(root), rootSequence);
 
-            part.editorialClip.duration = partDuration;
+            var partEditorialClip = FindEditorialClipForTimeline(root, part.timeline);
+            partEditorialClip.duration = partDuration;
 
             // Extend the parent clip length so it fits.
-            if (part.editorialClip.start + part.editorialClip.duration > root.GetTimelineSequence().editorialClip.duration)
+            var rootEditorialClip = FindEditorialClipForTimeline(root, part.timeline);
+            if (partEditorialClip.start + partEditorialClip.duration > rootEditorialClip.duration)
             {
-                root.GetTimelineSequence().editorialClip.duration = part.editorialClip.start + part.editorialClip.duration;
-                EditorUtility.SetDirty(root.GetTimelineSequence().timeline);
-                AssetDatabase.SaveAssetIfDirty(root.GetTimelineSequence().timeline);
+                rootEditorialClip.duration = partEditorialClip.start + partEditorialClip.duration;
+                EditorUtility.SetDirty(rootTimeline);
+                AssetDatabase.SaveAssetIfDirty(rootTimeline);
             }
 
             EditorUtility.SetDirty(part.timeline);
             AssetDatabase.SaveAssetIfDirty(part.timeline);
 
-            return new SequenceReference(root.GetTransform().Find(partNumber), root.GetMaster(), part);
+            return root.Find(partNumber);
         }
 
-        public static SequenceReference ShotSequence(string episodeName, string partNumber, string shotNumber)
+        public static Transform ShotSequence(string episodeName, string partNumber, string shotNumber)
         {
-            var root = RootSequence(episodeName);
-            var part = root.Child(partNumber);
-            var shot = part.Child(shotNumber);
-            return shot;
+            return RootSequence(episodeName).Find(partNumber).Find(shotNumber);
         }
 
-        public static SequenceReference CreateShotSequence(string episodeName, string partNumber, string shotNumber)
+        public static Transform CreateShotSequence(string episodeName, string partNumber, string shotNumber)
         {
             var root = RootSequence(episodeName);
-            var part = root.Child(partNumber).GetTimelineSequence();
-            var shot = SequenceUtility.CreateSequence(shotNumber, root.GetMaster(), part);
+            var part = root.Find(partNumber).GetComponent<PlayableDirector>().playableAsset as TimelineAsset;
+            var partSeq = GetTimelineSequence(root.Find(partNumber));
+            var shot = SequenceUtility.CreateSequence(shotNumber, GetMasterSequence(root), partSeq);
 
-            shot.editorialClip.duration = 10;
+            var shotEditorialClip = FindEditorialClipForTimeline(root.Find(partNumber), shot.timeline);
+            shotEditorialClip.duration = 10;
+            var partEditorialClip = FindEditorialClipForTimeline(root, part);
 
             // Extend the parent clip length so it fits.
-            if (shot.editorialClip.start + shot.editorialClip.duration > part.editorialClip.duration)
+            if (shotEditorialClip.start + shotEditorialClip.duration > partEditorialClip.duration)
             {
-                part.editorialClip.duration = shot.editorialClip.start + shot.editorialClip.duration;
-                EditorUtility.SetDirty(part.timeline);
-                AssetDatabase.SaveAssetIfDirty(part.timeline);
+                partEditorialClip.duration = shotEditorialClip.start + shotEditorialClip.duration;
+                EditorUtility.SetDirty(part);
+                AssetDatabase.SaveAssetIfDirty(part);
             }
 
             EditorUtility.SetDirty(shot.timeline);
             AssetDatabase.SaveAssetIfDirty(shot.timeline);
 
-            return new SequenceReference(root.GetTransform().Find(partNumber).Find(shotNumber), root.GetMaster(), shot);
+            return root.Find(partNumber).Find(shotNumber);
+        }
+
+        private static TimelineSequence GetTimelineSequence(Transform transform)
+        {
+            var sf = transform.GetComponent<SequenceFilter>();
+            var t = typeof(SequenceFilter);
+            var propertyInfo = t.GetProperty("sequence", BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.NonPublic);
+            return propertyInfo.GetValue(sf) as TimelineSequence;
+        }
+
+        private static TimelineClip FindEditorialClipForTimeline(Transform parent, TimelineAsset childTimeline)
+        {
+            var director = parent.GetComponent<PlayableDirector>();
+            var timeline = director.playableAsset as TimelineAsset;
+            foreach (var track in timeline.GetRootTracks())
+            {
+                var editorialTrack = track as EditorialTrack;
+                if (editorialTrack != null)
+                {
+                    foreach (var editorialClip in editorialTrack.GetClips())
+                    {
+                        var a = editorialClip.asset as EditorialPlayableAsset;
+                        var t = typeof(EditorialPlayableAsset).GetField("m_Timeline", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(a) as TimelineAsset;
+                        if (t == childTimeline)
+                        {
+                            return editorialClip;
+                        }
+                    }
+                }
+            }
+            return null;            
+        }
+
+        public static MasterSequence GetMasterSequence(Transform transform)
+        {
+            var sf = transform.GetComponent<SequenceFilter>();
+            var fieldInfo = typeof(SequenceFilter).GetField("m_MasterSequence", BindingFlags.NonPublic | BindingFlags.Instance);
+            return fieldInfo.GetValue(sf) as MasterSequence;
         }
     }
 }

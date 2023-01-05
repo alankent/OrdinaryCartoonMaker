@@ -70,3 +70,12 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+## CUSTOM FOR THIS PROJECT
+
+# Don't save the Sequences I create (not interesting)
+/Assets/Sequences/
+
+# Don't save Unity scene files for play projects either.
+/Assets/_LOCAL/Episodes/
