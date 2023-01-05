@@ -3,7 +3,7 @@
 ![Editor Window](./docs/EpisodeTab.png)
 
 This repository holds code for a Unity Editor Window for use with the
-[Unity Sequences](https://docs.unity3d.com/Packages/com.unity.sequences@1.1/manual/index.html)
+[Unity Sequences](https://docs.unity3d.com/Packages/com.unity.sequences@2.1/manual/index.html)
 package. This is a tool I use to create a cartoon series on YouTube,
 designed for my personal specific needs. If you don't like the way I have set
 up my projects, you may still find this package useful as sample code for
@@ -20,6 +20,13 @@ is still a lot of additional work beyond this tool.
 Here is a sample shot from [episode 1](https://youtu.be/4DDU01Kg9Lw).
 
 ![Sample shot](./docs/EORainSampleShot.png)
+
+Please note: The Sequences 2.1 API removed a few fields I needed access to
+from a previous version of the API so this code uses Reflection to sneak
+under the covers to get access to what I need (with some help from 
+[Ellka](https://forum.unity.com/members/ellka.3283484/) from Unity!)
+The Sequences API is planned to change again in the future, but this works
+until then.
 
 ## Project structure organization
 
@@ -81,6 +88,9 @@ animations sequences across tracks when there are multiple characters in a
 shot. Long story short, I use Sequences to manage the 3 levels of sequence
 Timelines, then I drop Animation Tracks and characters directly under the 3rd
 level of sequence in the scene hierarcy.
+
+Please note: I do not use Sequence Assets or the other capabilities of the
+Sequences package with prefab variants etc.
 
 ## The Ordinary Cartoon Maker Window
 
