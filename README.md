@@ -281,8 +281,3 @@ There is also an extension to pretty print a Google document using the above mar
 
 I blog at https://extra-ordinary.tv/blog.
 
-I would like to make it easier to create animation clips using motion capture
-from a webcam (like VSeeFace + EVMC4U + EasyMotionCapture), VR headset and
-controllers, or something like Sony Mocopi.
-Still experimenting. It might make more sense as a seperate window.
-
