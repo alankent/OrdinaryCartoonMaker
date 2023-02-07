@@ -167,7 +167,11 @@ To provide the information to create the animation track prefabs with a
 items, insert " % " (a percent character with one space either side).
 This allows better nesting of all the characters.
 
-### Speech
+`Assets/_SHARED/Ordinary Cartool Maker/Templates/Characters/Hank % Classroom % Sitting.prefab`
+for example could be a `CharacterInstructions` instance which holds a
+clip referene and the performance seed (typically 1).
+
+### Animate
 
 ![Animate Tab](./docs/AnimateTab.png)
 
@@ -188,6 +192,80 @@ the "Ordinary Script Formatter". The supported formatting is as follows:
 * `{directive}` is used to capture a directive on how add cameras and characters to a shot.
 * `-Name-` is used to identify the speaker
 * `(text)` - captures the mood or speaking style of the speaker. `(thinking)` is used to change the closed caption tex.
+* Lines after a `-Name-` up until the next shot are assumed to be dialog. Before the `-Name-` are ignored as action instructions.
+
+More formally, the grammar of screenplay is:
+
+```
+screenplay = other-line* (
+    section-divider other-line*
+    | shot-id-line other-line* directive-line* other-line* (
+        speaker-line speaker-mood-line? dialog-line*
+    )*
+)*
+
+section-divider = heading-line | location-line | music-line
+
+heading-line = "#" text
+
+location-line = ("INT."|"EXT.") text
+
+music-line = "MUSIC:" text
+
+shot-id-line = "[" episode-number "-" part-number "-" shot-number "]" text
+episode-number = digit+
+part-number = digit+
+shot-number = digit+
+
+directive-line = "{" target arg* "}"
+target = word
+arg = arg-name ":" arg-value
+arg-name = word
+arg-value = word   (maybe extend to quoted text in future)
+
+speaker-line = "-" speaker-name "-"
+speaker-name = text
+
+speaker-mood-line = "(" mood ")"
+mood = text
+
+dialog-line = text
+
+other-line = text
+```
+
+Directives are:
+
+* `{shot ...}` - one per shot to set the main camera and shot settings
+  * Example: `{shot camera:65mm wind:gusty}`
+  * `camera` is the main camera prefab to use (defaults to `16mm`)
+  * `light` is an optional lighting prefab to add a light (like the sun)
+  * `wind` is a prefab for a wind zone
+  * `cloud` is a name name of the volumetrics simple cloud type to use ("cloudy" etc)
+* `{cm ...}` - adds a Cinemachine camera to the scene
+  * Example: `{cm lookAt:Hank from:Behind}`
+  * Example: `{cm lookAt:Hank sitting frame:Closeup}`
+  * Example: `{cm lookAt:Hank follow:Sam from:BehindLeftShoulder}`
+  * `camera` is the camera prefab to use
+  * `look` specifies a direction (North/South/East/West).
+  * `sitting` adjusts the height of a lookAt target lower
+  * `lookAt` specifies the character to look at
+  * `follow` turns on Cinemachine following of a character
+  * `from` specifies the follow offset (Front, Behind, Left, Right, BehindLeftShoulder, BehindRightShoulder)
+  * `frame` controls how close the camera is to the character (Closeup, Mid, Wide)
+* `{Sam/Classroom/Sitting ...}` - add a character with an initial location and animation clip to the shot
+  * Example: `{Hank/OutsideClassroom/Walking look:Down lh:Fist rh:Fist face:Angry clip:HankHoldingBag,BagOn}`
+  * Example: `{Hank/Classroom/Sitting face:Angry rotate:180 lookAt:Sam}`
+  * `body` adds a Body animation clip
+  * `upper` adds an Upper Body animation clip (with avatar mask)
+  * `head` adds a Head animation clip (with avatar mask)
+  * `face` adds a Face animation clip
+  * `lh` adds a Left Hand animation clip (with avatar mask)
+  * `rh` adds a Right Hand animation clip (with avatar mask)
+  * `clip` adds a Generic animation clip in a new track
+  * `look` turns the characters head Up, Down, Left, Right
+  * `lookAt` makes the character track looking at another character
+  * `rotate` rotates the character the specified angle (e.g. 180)
 
 ## Other
 
