@@ -178,8 +178,12 @@ clip referene and the performance seed (typically 1).
 With a character selected in the scene hierarchy or by selecting the animation
 track for the character, enter the values you wish to add to (e.g., body clips
 for the Body, Upper Body, Head, Face, Left Hand, Right Hand, or a generic script.
+
 You can also enter dialog, which controls the face to do an approximate lip-sync.
-A track is added to display the captions bubbles. 
+A track is added to display the captions text at the bottom of the screen. 
+(I used to use speech bubbles like a cartoon, but using captions does not require
+special positioning of bubbles, plus it opens up the option to add an audio track
+with the dialog later.)
 
 You can also record a animation clip via the VMC protocol (I use the VSeeFace
 app to generate VMC data via a webcam and UltraLeap camera). You click the
@@ -197,7 +201,7 @@ the "Ordinary Script Formatter". The supported formatting is as follows:
 * `[n-nn-nnn]` holds a shot number code (episode, part, and shot number). After the reference at the start of a line, additional instructions can be written before filming.
 * `{directive}` is used to capture a directive on how add cameras and characters to a shot.
 * `-Name-` is used to identify the speaker
-* `(text)` - captures the mood or speaking style of the speaker. `(thinking)` is used to change the closed caption tex.
+* `(text)` - captures the mood or speaking style of the speaker. `(thinking)` is used to change the closed caption text to italics.
 * Lines after a `-Name-` up until the next shot are assumed to be dialog. Before the `-Name-` are ignored as action instructions.
 
 More formally, the grammar of screenplay is:
