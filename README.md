@@ -181,6 +181,12 @@ for the Body, Upper Body, Head, Face, Left Hand, Right Hand, or a generic script
 You can also enter dialog, which controls the face to do an approximate lip-sync.
 A track is added to display the captions bubbles. 
 
+You can also record a animation clip via the VMC protocol (I use the VSeeFace
+app to generate VMC data via a webcam and UltraLeap camera). You click the
+`Start Receiving VMC Packets` button first, then `Record` / `Stop Recording`
+buttons will appear. The recorded animation clip will be added as a new
+override track to the animation track for the character.
+
 ## Screenplay
 
 Screenplays must be formatted in a particular way to be processed by
