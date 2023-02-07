@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Episode Number" name="EpisodeNumber" binding-path="EpisodeNumber" />
+    <ui:TextField picking-mode="Ignore" label="Episode Title" name="EpisodeTitle" binding-path="EpisodeTitle" />
+    <ui:DropdownField label="Scene Template" index="0" choices="a,b" name="SceneTemplate" binding-path="SceneTemplate" />
+    <ui:FloatField label="Frame Rate" value="24" name="FPS" binding-path="FrameRate" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:Button tabindex="-1" text="Create Episode" display-tooltip-when-elided="true" name="CreateEpisodeButton" class="create-episode-button" />
+    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="CreateEpisodeError" binding-path="CreateEpisodeErrorMessage" style="margin-top: 10px; color: rgb(255, 47, 47); white-space: normal;" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Screenplay" multiline="true" name="ScreenplayContents" binding-path="ScreenplayContents" style="height: 113px;" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:Button tabindex="-1" text="Populate Episode From Screenplay" display-tooltip-when-elided="true" name="ParseScreenplayButton" focusable="true" class="create-episode-button" />
+    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="ParseScreenplayError" binding-path="ParseScreenplayErrorMessage" style="margin-top: 10px; color: rgb(255, 47, 47); white-space: normal;" />
+</ui:UXML>

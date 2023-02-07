@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Episode Number" value="filler text" readonly="true" focusable="false" binding-path="EpisodeNumber" />
+    <ui:TextField picking-mode="Ignore" label="Episode Title" value="filler text" focusable="false" binding-path="EpisodeTitle" readonly="true" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Part Number" name="PartNumber" binding-path="PartNumber" />
+    <ui:IntegerField label="Part Duration (secs)" value="100" name="PartDuration" binding-path="PartDuration" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:Button tabindex="-1" text="Create Part" display-tooltip-when-elided="true" name="CreatePartButton" />
+    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="CreatePartErrorMessage" binding-path="CreatePartErrorMessage" label="Part Duration (s" style="color: rgb(255, 8, 8);" />
+</ui:UXML>

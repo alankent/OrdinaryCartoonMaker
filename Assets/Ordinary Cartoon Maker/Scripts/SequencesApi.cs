@@ -98,7 +98,7 @@ namespace OrdinaryCartoonMaker
             return root.Find(partNumber).Find(shotNumber);
         }
 
-        private static TimelineSequence GetTimelineSequence(Transform transform)
+        public static TimelineSequence GetTimelineSequence(Transform transform)
         {
             var sf = transform.GetComponent<SequenceFilter>();
             var t = typeof(SequenceFilter);

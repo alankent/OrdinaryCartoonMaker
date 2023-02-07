@@ -11,7 +11,7 @@ creating your own helper tools for manipulating Sequences, Timelines,
 Animation Tracks, etc. It uses UI Toolkit for the UI.
 
 I use Unity as a rendering engine for 3D models, locations, lighting, and
-special effects (not games), using Unity Timelines, capturing the output in
+special effects  using Unity Timelines, capturing the output in
 video files. Think of cutscenes in a game. I work in Editor mode
 to assemble Timelines. This tool is an additional editor window with a
 few common operations I perform to speed my work up. Full cartoon creation
@@ -53,7 +53,7 @@ scheme makes it easy to gather and sort all the video clips by filename
 for composing the final video file.
 Sometimes I break the rule and create multiple video clips from
 a single Sequence, but normally I create a new sequence per shot so I can
-change camera settings per video clip (e.g. to adjust exposure).
+change camera settings per video clip (e.g. to adjust camera depth of field).
 
 The Editor window in this tool can
 
@@ -61,7 +61,7 @@ The Editor window in this tool can
 * Add parts to the scene (for grouping a series of shots)
 * Add shots to scenes with the choice of camera to use
 * Add characters to shots creating animation tracks for the characters
-* Add speech bubbles to the shots (I don't use real voice tracks)
+* Animate charactesr in shots, including dialog captions (I don't use real voice tracks... yet)
 
 ## Sequences
 
@@ -89,9 +89,6 @@ shot. Long story short, I use Sequences to manage the 3 levels of sequence
 Timelines, then I drop Animation Tracks and characters directly under the 3rd
 level of sequence in the scene hierarcy.
 
-Please note: I do not use Sequence Assets or the other capabilities of the
-Sequences package with prefab variants etc.
-
 ## The Ordinary Cartoon Maker Window
 
 Opening "Window / Ordinary Cartoon Maker" opens a new window with multiple
@@ -107,13 +104,25 @@ profile you use at the scene level for all scenes). The frame rate can also be
 specified here (I typically use 24 frames per second, the standard rate for
 film).
 
-Create scene templates by creating a scene in the directory `Assets/Ordinary
-Cartoon Maker/Templates/Scenes` or `Assets/_LOCAL/Ordinary Cartoon
-Maker/Templates/Scenes`.
+Create scene templates by creating a scene in the one of the directories
+* `Assets/Ordinary Cartoon Maker/Templates/Scenes`,
+* `Assets/_SHARED/Ordinary Cartoon Maker/Templates/Scenes`, or
+* `Assets/_LOCAL/Ordinary Cartoon Maker/Templates/Scenes`.
 
 The "Create Epsiode" button then creates an episode scene file such as
 `Assets/_LOCAL/Episodes/Episode 1 - Outsider/Episode 1 - Outsider.unity`.
 An empty "master" sequence is then created in the scene. 
+
+After the scene is created, you can write a screenplay in a particular
+format (I do it as a Google doc) and paste the text into the "Screenplay"
+text input area then click "Populate Episode From Screenplay". 
+This will create Sequences for all the shots in the screenplay,
+add the requested main and Cinemachine cameras, add the requested
+characters, and animation clips for the characters. These will all
+require manual editing afterwards, but I find it useful to speed
+up the creation of a new scene.
+
+The supported syntax for screenplays is described below.
 
 ### Part
 
@@ -128,17 +137,18 @@ sub-sequence under the master sequence in the scene.
 ![Shot Tab](./docs/ShotTab.png)
 
 Enter the shot number, recording type (movie file or a single still frame that
-I sometimes use between parts), camera type, and camera position to create a
-new shot sub-sub-sequence under a part sub-sequence.
+I sometimes use between parts), camera type, main camera, and Cinemachine camera
+to create a new shot sub-sub-sequence under a part sub-sequence.
+You can also optionally provide values for a light to add to a scene (typically
+the sun), what cloud mode to use, and wind characteristics.
 
 The recording type is used to create a Unity Recorder track for a movie file (I
 use WebM as the Recorder video file format as I get better quality files than
 when using MP4).
 
-I create camera prefabs in `Assets/Ordinary Cartoon Maker/Templates/Camera
-Types` to hold a main camera and a Cinemachine virtual camera. I may create
-additional virtual cameras in a shot, but I always have at least one. The
-different prefabs are for different main camera settings (e.g. different depth
+The main camera and Cinemachine cameras are created separately as you can
+add many Cinemachine cameras to a shot, but there is only ever one main camera.
+The different prefabs are for different main camera settings (e.g. different depth
 of field settings or HDRP settings).
 
 ### Character
@@ -151,23 +161,33 @@ animation clip at his desk). The character prefab is added under the shot
 sequence, an animation track is created, override tracks are added if hand
 animation clips/poses are included, etc.
 
-To provide the information to creat the animation track prefabs with a
+To provide the information to create the animation track prefabs with a
 "Character Instructions" component added are stored under
-`Assets/_LOCAL/Ordinary Cartoon Maker/Templates/Characters`. Subfolders can be
-used, which will map onto nested menu items. E.g. create a folder per
-character, with a subfolder per location, then a prefab per animation clip at
-that location. The animation tracks will almost certainly need further editing
-- this setup is to reduce the manual effort to get going.
+`Assets/_LOCAL/Ordinary Cartoon Maker/Templates/Characters`. For nested menu
+items, insert " % " (a percent character with one space either side).
+This allows better nesting of all the characters.
 
 ### Speech
 
-![Speech Tab](./docs/SpeechTab.png)
+![Animate Tab](./docs/AnimateTab.png)
 
-With a shot selected, enter text to display in a speech bubble (my cartoons
-while animated, do not have a voice track at the moment - I use speech bubbles
-with music). A track is added to display the speech bubbles. Adjustments are
-normally required to get the bubble positioned correctly, but its useful to
-quickly get it in the right posiion.
+With a character selected in the scene hierarchy or by selecting the animation
+track for the character, enter the values you wish to add to (e.g., body clips
+for the Body, Upper Body, Head, Face, Left Hand, Right Hand, or a generic script.
+You can also enter dialog, which controls the face to do an approximate lip-sync.
+A track is added to display the captions bubbles. 
+
+## Screenplay
+
+Screenplays must be formatted in a particular way to be processed by
+the "Ordinary Script Formatter". The supported formatting is as follows:
+
+* All text up to the first line starting with "EXT." or "INT." is ignored
+* `#` through `####` can be used for section breaks.
+* `[e-p-s]` holds a reference to an entity. After the reference at the start of a line, additional instructions can be written before filming.
+* `{directive}` is used to capture a directive on how add cameras and characters to a shot.
+* `-Name-` is used to identify the speaker
+* `(text)` - captures the mood or speaking style of the speaker. `(thinking)` is used to change the closed caption tex.
 
 ## Other
 

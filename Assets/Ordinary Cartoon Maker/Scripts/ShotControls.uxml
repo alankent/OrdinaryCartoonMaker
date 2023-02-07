@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Divider" tabindex="-1" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Episode Number" value="filler text" readonly="true" focusable="false" binding-path="EpisodeNumber" tabindex="-1" />
+    <ui:TextField picking-mode="Ignore" label="Episode Title" value="filler text" focusable="false" binding-path="EpisodeTitle" readonly="true" tabindex="-1" />
+    <ui:TextField picking-mode="Ignore" label="Part Number" binding-path="PartNumber" readonly="true" tabindex="-1" />
+    <ui:VisualElement name="Divider" tabindex="-1" style="height: 10px;" />
+    <ui:TextField picking-mode="Ignore" label="Shot Number" name="ShotNumber" binding-path="ShotNumber" />
+    <ui:DropdownField label="Recording Type" name="RecordingType" binding-path="RecordingType" tabindex="1" />
+    <ui:DropdownField label="Main Camera" name="MainCamera" binding-path="MainCamera" tabindex="2" />
+    <ui:DropdownField label="Cinemachine Camera" index="0" name="CinemachineCamera" binding-path="CinemachineCamera" tabindex="2" />
+    <ui:DropdownField label="Camera Position" index="0" choices=" " name="CameraPosition" binding-path="CameraPosition" tabindex="3" />
+    <ui:DropdownField label="Light" index="0" choices=" " name="Light" binding-path="Light" tabindex="3" />
+    <ui:DropdownField label="Cloud" index="0" choices=" " name="Cloud" binding-path="Cloud" tabindex="3" />
+    <ui:DropdownField label="Wind" index="0" choices=" " name="Wind" binding-path="Wind" tabindex="3" />
+    <ui:VisualElement name="Divider" tabindex="-1" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:Button tabindex="4" text="Create Shot" display-tooltip-when-elided="true" name="CreateShotButton" />
+    <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="CreateShotErrorMessage" binding-path="CreateShotErrorMessage" label="Part Duration (s" style="color: rgb(255, 8, 8);" />
+</ui:UXML>

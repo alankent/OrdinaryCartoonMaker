@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="EpisodeControls" src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/EpisodeControls.uxml?fileID=9197481963319205126&amp;guid=a08b60b283bccc74cb6281479b353362&amp;type=3#EpisodeControls" />
+    <ui:Template name="PartControls" src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/PartControls.uxml?fileID=9197481963319205126&amp;guid=34a9ed30f9575a64196cd445a09077fe&amp;type=3#PartControls" />
+    <ui:Template name="ShotControls" src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/ShotControls.uxml?fileID=9197481963319205126&amp;guid=802e7f8946c37e14f9dd611d4fdc71c5&amp;type=3#ShotControls" />
+    <ui:Template name="CharacterControls" src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/CharacterControls.uxml?fileID=9197481963319205126&amp;guid=ec237c2a3005b7744ab4fe61f0a55c0b&amp;type=3#CharacterControls" />
+    <ui:Template name="AnimateControls" src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/AnimateControls.uxml?fileID=9197481963319205126&amp;guid=93162e0921146da43ad5580b52a16120&amp;type=3#AnimateControls" />
+    <Style src="project://database/Assets/Ordinary%20Cartoon%20Maker/Scripts/TabbedMenu.uss?fileID=7433441132597879392&amp;guid=f485d1114a264ae42a9f889438062346&amp;type=3#TabbedMenu" />
+    <ui:VisualElement name="tabs">
+        <ui:Label tabindex="-1" text="Episode" display-tooltip-when-elided="true" name="CreateEpisodeTab" class="tab currentlySelectedTab" />
+        <ui:Label tabindex="-1" text="Part" display-tooltip-when-elided="true" name="CreatePartTab" class="tab" />
+        <ui:Label tabindex="-1" text="Shot" display-tooltip-when-elided="true" name="CreateShotTab" class="tab" />
+        <ui:Label tabindex="-1" text="Character" display-tooltip-when-elided="true" name="AddCharacterTab" class="tab" />
+        <ui:Label tabindex="-1" text="Animate" display-tooltip-when-elided="true" name="AnimateCharacterTab" class="tab" />
+    </ui:VisualElement>
+    <ui:VisualElement name="tabContent">
+        <ui:VisualElement tabindex="-1" name="CreateEpisodeContent">
+            <ui:Instance template="EpisodeControls" name="EpisodeControls" />
+        </ui:VisualElement>
+        <ui:VisualElement tabindex="-1" name="CreatePartContent" class="unselectedContent">
+            <ui:Instance template="PartControls" name="PartControls" />
+        </ui:VisualElement>
+        <ui:VisualElement tabindex="-1" name="CreateShotContent" class="unselectedContent">
+            <ui:Instance template="ShotControls" name="ShotControls" />
+        </ui:VisualElement>
+        <ui:VisualElement tabindex="-1" name="AddCharacterContent" class="unselectedContent">
+            <ui:Instance template="CharacterControls" name="CharacterControls" />
+        </ui:VisualElement>
+        <ui:VisualElement tabindex="-1" name="AnimateCharacterContent" class="unselectedContent">
+            <ui:Instance template="AnimateControls" name="AnimateControls" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

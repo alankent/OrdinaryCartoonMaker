@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:TextField picking-mode="Ignore" label="Episode Number" value="filler text" readonly="true" focusable="false" binding-path="EpisodeNumber" />
+    <ui:TextField picking-mode="Ignore" label="Episode Title" value="filler text" focusable="false" binding-path="EpisodeTitle" readonly="true" />
+    <ui:TextField picking-mode="Ignore" label="Part Number" binding-path="PartNumber" readonly="true" />
+    <ui:TextField picking-mode="Ignore" label="Shot Number" binding-path="ShotNumber" readonly="true" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:DropdownField label="Character" index="0" name="SpeechCharacterSelection" binding-path="SpeechCharacterSelection" />
+    <ui:TextField picking-mode="Ignore" label="Text" name="SpeechText" binding-path="SpeechText" multiline="true" />
+    <ui:VisualElement name="Divider" style="height: 10px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+    <ui:Button tabindex="-1" text="Create Speech" display-tooltip-when-elided="true" name="CreateSpeechButton" />
+    <ui:Label tabindex="-1" display-tooltip-when-elided="false" name="CreateSpeechErrorMessage" binding-path="CreateSpeechErrorMessage" label="Text" password="false" multiline="true" text="&#10;" style="color: rgb(255, 8, 8);" />
+</ui:UXML>
