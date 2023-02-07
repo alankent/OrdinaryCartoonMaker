@@ -188,7 +188,7 @@ the "Ordinary Script Formatter". The supported formatting is as follows:
 
 * All text up to the first line starting with "EXT." or "INT." is ignored
 * `#` through `####` can be used for section breaks.
-* `[e-p-s]` holds a reference to an entity. After the reference at the start of a line, additional instructions can be written before filming.
+* `[n-nn-nnn]` holds a shot number code (episode, part, and shot number). After the reference at the start of a line, additional instructions can be written before filming.
 * `{directive}` is used to capture a directive on how add cameras and characters to a shot.
 * `-Name-` is used to identify the speaker
 * `(text)` - captures the mood or speaking style of the speaker. `(thinking)` is used to change the closed caption tex.
@@ -266,6 +266,10 @@ Directives are:
   * `look` turns the characters head Up, Down, Left, Right
   * `lookAt` makes the character track looking at another character
   * `rotate` rotates the character the specified angle (e.g. 180)
+
+There is also an extension to pretty print a Google document using the above markup.
+
+![Screenplay](./docs/Screenplay.png)
 
 ## Other
 
